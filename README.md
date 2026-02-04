@@ -1,0 +1,1 @@
+A demo program which listens on a local TCP socket and shows an example kiosk GUI. The program settings are in settings.json - if this file is not present, the program will generate one with default values and panic. You can edit them and re-run the program.

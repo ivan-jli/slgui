@@ -1,0 +1,180 @@
+import {
+    Button,
+    // Brush,
+    VerticalBox,
+    HorizontalBox,
+    Slider,
+    GroupBox,
+    StandardTableView,
+    ListView,
+    ScrollView,
+    // Color,
+} from "std-widgets.slint";
+import { Palette } from "../global.slint";
+
+export struct MessageRow {
+    ts: string,
+    priority: string,
+    message: string,
+}
+
+// warning - identical structure exists in the Rust code
+// todo check if there is an option to have them in one place.
+export struct InterfaceDefinitionSlint {
+    bg_color: color,
+    text_color_zone_1: color,
+    text_color_zone_2: color,
+}
+
+
+export component AppWindow inherits Window {
+    in-out property <int> weight: 42;
+    in property <[MessageRow]> list-of-main-program-messages: [];
+    in property <InterfaceDefinitionSlint> interface_definition;
+    callback request-increase-value();
+    callback request-set-value(value: int);
+    // callback request-set-text(value: (string, string, string));
+    background: Palette.background;
+    // width: 1024px; height: 768px;
+    width: 800px;
+    height: 600px;
+    // width: 1280px; height: 1024px;
+    VerticalLayout { // main
+        padding: 10px;
+        HorizontalLayout { // 1st row
+            alignment: space-between;
+            height: 25%;
+            Image {
+                width: 25%;
+                source: @image-url("../images/slint.svg");
+            }
+
+            Rectangle {
+                border-color: white;
+                border-width: 2px;
+                width: 10%;
+            }
+
+            Rectangle {
+                background: black;
+                width: 50%;
+                VerticalLayout {
+                    padding: parent.padding;
+
+                    Text {
+                        horizontal-alignment: right;
+                        text: @tr("{}XX", root.weight);
+                        color: interface_definition.text-color-zone-1;
+                        font-size: 64px; // problem when the font-size is > 64px with QT; export SLINT_BACKEND=winit fixes it
+                        font-weight: 600;
+                    }
+
+                    Text {
+                        // height: parent.height * 30%; // binding loop!
+                        horizontal-alignment: right;
+                        text: @tr("Example text");
+                        color: interface_definition.text-color-zone-1;
+                        font-size: 40px;
+                    }
+
+                    // background: grey;
+                        
+
+                        HorizontalBox {
+                            // background: grey;
+                            height: 5px;
+
+                        Slider {
+                            height: 5px;
+                            min-width: 100px;
+                            enabled: true;
+                            
+                        // width: parent.width / 4;
+                        // x: parent.width * 75%;
+                        // y: parent.height * 75%;
+                        // drop-shadow-color: 
+                        // height: 40px;
+                        value: 0;
+                            maximum: 50000;
+                            changed(value) => {
+                                request-set-value(value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout { //2nd row
+            height: 35%;
+            padding: parent.padding;
+            // alignment: space-around;
+            VerticalLayout {
+                Rectangle {
+                    background: black;
+                    GroupBox {
+                        width: parent.width;
+                        // title: @tr("Main program messages");
+                        height: parent.height;
+                        VerticalLayout {
+                            // padding: parent.parent.padding;
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            Rectangle {
+                                // background: white;
+                            Text {
+                                    text: @tr("Main program messages");
+                                    // color: #32e732;
+                                    color: interface_definition.text-color-zone-2;
+                                    font-size: 24px;
+                                    font-weight: 600;
+                                }
+                            }
+
+                            ListView {
+                                viewport-y: -36px * list-of-main-program-messages.length; //?????? todo   
+                                for data in list-of-main-program-messages: Rectangle {
+                                    width: parent.width;
+                                    height: 36px; // padding: 10px + font-size: 24px ?
+                                    // padding: parent.padding;
+                                    Text {
+                                        font-size: 24px;
+                                        x: 0; // when x set, affects y too!! Bug?
+                                        y: self.font-size / 2;
+                                        text: @tr("{} {} {}", data.ts, data.priority, data.message);
+                                        color: white;
+                                    }
+                            
+                            // columns: [
+                            //     {
+                            //         title: @tr("title1")
+                            //     },
+                            //     {
+                            //         title: @tr("title2")
+                            //     },
+                            // ];
+
+                        }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout { //3rd row
+            height: 25%;
+        }
+
+        HorizontalLayout { //4th row
+            height: 10%;
+        }
+
+        Button {
+            text: "Increase value";
+            clicked => {
+                root.request-increase-value();
+            }
+        }
+    }
+}
