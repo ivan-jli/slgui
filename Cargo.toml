@@ -7,10 +7,13 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.100"
+bytes = "1.11.1"
+crc32fast = "1.5.0"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 slint = "1.14.1"
 tokio = { version = "1.49.0", features = ["full"] }
+network_comm = { path = "../network_comm" }
 
 [build-dependencies]
 slint-build = "1.14.1"

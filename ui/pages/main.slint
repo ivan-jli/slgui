@@ -21,9 +21,16 @@ export struct MessageRow {
 // warning - identical structure exists in the Rust code
 // todo check if there is an option to have them in one place.
 export struct InterfaceDefinitionSlint {
+    full_screen: bool,
     bg_color: color,
     text_color_zone_1: color,
+    bg_color_zone_1: color,
+    unit_zone_1: string,
+    text_zone_1: string,
     text_color_zone_2: color,
+    bg_color_zone_2: color,
+    logo_image_file: string,
+
 }
 
 
@@ -33,11 +40,11 @@ export component AppWindow inherits Window {
     in property <InterfaceDefinitionSlint> interface_definition;
     callback request-increase-value();
     callback request-set-value(value: int);
-    // callback request-set-text(value: (string, string, string));
-    background: Palette.background;
-    // width: 1024px; height: 768px;
-    width: 800px;
-    height: 600px;
+    background: interface_definition.bg-color;
+    full-screen: interface_definition.full-screen;
+    width: 1024px; height: 768px;
+    // width: 800px;
+    // height: 600px;
     // width: 1280px; height: 1024px;
     VerticalLayout { // main
         padding: 10px;
@@ -45,25 +52,19 @@ export component AppWindow inherits Window {
             alignment: space-between;
             height: 25%;
             Image {
-                width: 25%;
-                source: @image-url("../images/slint.svg");
+                width: 48%;
+                source: @image-url("../images/logo.png");
             }
-
+            // Zone 1
             Rectangle {
-                border-color: white;
-                border-width: 2px;
-                width: 10%;
-            }
-
-            Rectangle {
-                background: black;
+                background: interface_definition.bg-color-zone-1;
                 width: 50%;
                 VerticalLayout {
-                    padding: parent.padding;
+                    padding: 10px;
 
                     Text {
                         horizontal-alignment: right;
-                        text: @tr("{}XX", root.weight);
+                        text: @tr("{} {}", root.weight, root.interface_definition.unit-zone-1);
                         color: interface_definition.text-color-zone-1;
                         font-size: 64px; // problem when the font-size is > 64px with QT; export SLINT_BACKEND=winit fixes it
                         font-weight: 600;
@@ -72,95 +73,48 @@ export component AppWindow inherits Window {
                     Text {
                         // height: parent.height * 30%; // binding loop!
                         horizontal-alignment: right;
-                        text: @tr("Example text");
+                        text: @tr("{}", root.interface_definition.text-zone-1);
                         color: interface_definition.text-color-zone-1;
                         font-size: 40px;
                     }
-
-                    // background: grey;
-                        
-
                         HorizontalBox {
-                            // background: grey;
-                            height: 5px;
-
-                        Slider {
-                            height: 5px;
-                            min-width: 100px;
-                            enabled: true;
-                            
-                        // width: parent.width / 4;
-                        // x: parent.width * 75%;
-                        // y: parent.height * 75%;
-                        // drop-shadow-color: 
-                        // height: 40px;
-                        value: 0;
-                            maximum: 50000;
-                            changed(value) => {
-                                request-set-value(value);
-                            }
-                        }
+                        height: 5px;
                     }
                 }
             }
         }
 
-        HorizontalLayout { //2nd row
+        // Zone 2
+        HorizontalLayout { 
             height: 35%;
-            padding: parent.padding;
-            // alignment: space-around;
             VerticalLayout {
                 Rectangle {
-                    background: black;
+                    background: interface_definition.bg-color-zone-2;
                     GroupBox {
                         width: parent.width;
-                        // title: @tr("Main program messages");
                         height: parent.height;
                         VerticalLayout {
-                            // padding: parent.parent.padding;
                             padding-left: 10px;
                             padding-right: 10px;
                             Rectangle {
-                                // background: white;
-                            Text {
-                                    text: @tr("Main program messages");
-                                    // color: #32e732;
-                                    color: interface_definition.text-color-zone-2;
-                                    font-size: 24px;
-                                    font-weight: 600;
-                                }
                             }
-
-                            ListView {
-                                viewport-y: -36px * list-of-main-program-messages.length; //?????? todo   
-                                for data in list-of-main-program-messages: Rectangle {
-                                    width: parent.width;
-                                    height: 36px; // padding: 10px + font-size: 24px ?
-                                    // padding: parent.padding;
-                                    Text {
-                                        font-size: 24px;
-                                        x: 0; // when x set, affects y too!! Bug?
-                                        y: self.font-size / 2;
-                                        text: @tr("{} {} {}", data.ts, data.priority, data.message);
-                                        color: white;
-                                    }
-                            
-                            // columns: [
-                            //     {
-                            //         title: @tr("title1")
-                            //     },
-                            //     {
-                            //         title: @tr("title2")
-                            //     },
-                            // ];
-
-                        }
+                            for row[i] in list-of-main-program-messages: //{
+                                
+                                Text {
+                                    font-size: 35px;
+                                    x: 0; // when x set, affects y too!! Bug?
+                                    // y: i * 10px;
+                                    text: @tr("{}", row.message);
+                                    color: white;
+                                    horizontal-alignment: center;   
+                                }
+                                
                             }
                         }
                     }
                 }
             }
-        }
+       // }
 
         HorizontalLayout { //3rd row
             height: 25%;
@@ -168,13 +122,6 @@ export component AppWindow inherits Window {
 
         HorizontalLayout { //4th row
             height: 10%;
-        }
-
-        Button {
-            text: "Increase value";
-            clicked => {
-                root.request-increase-value();
-            }
         }
     }
 }

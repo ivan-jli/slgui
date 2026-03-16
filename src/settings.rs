@@ -1,6 +1,6 @@
 use anyhow::{anyhow, bail, Result};
 use serde::{Deserialize, Serialize};
-use slint::Color;
+use slint::{Color, SharedString};
 use std::{
     fs::File,
     net::{SocketAddr, SocketAddrV4},
@@ -59,35 +59,47 @@ impl Default for JsonSettings {
                 8268,
             )),
             interface_definition: InterfaceDefinition {
+                full_screen: true,
                 bg_color: "#333333".into(),
                 text_color_zone_1: "#BBBBBB".into(),
+                bg_color_zone_1: "#000000".into(),
+                unit_zone_1: "kg".into(),
+                text_zone_1: "".into(),
                 text_color_zone_2: "#AAFFAA".into(),
+                logo_image_file: "slint.svg".into(),
+                bg_color_zone_2: "#000000".into(),
             },
         }
     }
 }
 
-// #[derive(Deserialize, Serialize)]
-// struct ConnectionSettings {
-
-//     ip: IpAddr,
-//     port: u16,
-// }
-
 #[derive(Deserialize, Serialize, Clone)]
 struct InterfaceDefinition {
+    full_screen: bool,
     bg_color: String,
+    logo_image_file: String,
     text_color_zone_1: String,
+    bg_color_zone_1: String,
+    unit_zone_1: String,
+    text_zone_1: String,
     text_color_zone_2: String,
+    bg_color_zone_2: String,
 }
 
 impl TryFrom<InterfaceDefinition> for InterfaceDefinitionSlint {
     type Error = anyhow::Error;
     fn try_from(value: InterfaceDefinition) -> Result<Self> {
         Ok(Self {
+            full_screen: value.full_screen,
             text_color_zone_1: convert_string_rgb_color(&value.text_color_zone_1)?,
+            unit_zone_1: SharedString::from(&value.unit_zone_1),
+            text_zone_1: SharedString::from(&value.text_zone_1),
             bg_color: convert_string_rgb_color(&value.bg_color)?,
             text_color_zone_2: convert_string_rgb_color(&value.text_color_zone_2)?,
+            logo_image_file: SharedString::from(&value.logo_image_file),
+            bg_color_zone_1: convert_string_rgb_color(&value.bg_color_zone_1)?,
+            bg_color_zone_2: convert_string_rgb_color(&value.bg_color_zone_2)?,
+            
         })
     }
 }
